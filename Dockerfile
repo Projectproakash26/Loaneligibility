@@ -1,10 +1,13 @@
-FROM python:3.10-slim
+FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install only what's needed to compile scikit-learn 0.24.2
+# Install only build tools needed for scipy, scikit-learn, xgboost, etc.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    gfortran \
+    liblapack-dev \
+    libblas-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
