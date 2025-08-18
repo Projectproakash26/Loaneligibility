@@ -1,21 +1,19 @@
-# Use lightweight Python base
 FROM python:3.10-slim
 
-# Set work directory
 WORKDIR /app
 
-# Copy requirements
+# Install only what's needed to compile scikit-learn 0.24.2
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 
-# Install dependencies
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
 COPY . .
 
-# Expose port
 EXPOSE 8080
 
-# Run app with Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
