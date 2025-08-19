@@ -1,22 +1,8 @@
-FROM python:3.9-slim
-
+FROM python:3.10-slim
 WORKDIR /app
-
-# Install only build tools needed for scipy, scikit-learn, xgboost, etc.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gfortran \
-    liblapack-dev \
-    libblas-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8080
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+COPY GBM_Model_version1.pkl ./GBM_Model_version1.pkl
+COPY requirements.txt ./requirements.txt
+COPY app.py ./app.py
+RUN pip install --no-cache-dir -r requirements.txt
+ENV PORT 8080
+CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 app:app
